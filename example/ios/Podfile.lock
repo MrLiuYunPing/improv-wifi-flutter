@@ -1,0 +1,34 @@
+PODS:
+  - Flutter (1.0.0)
+  - improv_wifi_flutter (0.0.1):
+    - Flutter
+  - integration_test (0.0.1):
+    - Flutter
+  - permission_handler_apple (9.3.0):
+    - Flutter
+
+DEPENDENCIES:
+  - Flutter (from `Flutter`)
+  - improv_wifi_flutter (from `.symlinks/plugins/improv_wifi_flutter/ios`)
+  - integration_test (from `.symlinks/plugins/integration_test/ios`)
+  - permission_handler_apple (from `.symlinks/plugins/permission_handler_apple/ios`)
+
+EXTERNAL SOURCES:
+  Flutter:
+    :path: Flutter
+  improv_wifi_flutter:
+    :path: ".symlinks/plugins/improv_wifi_flutter/ios"
+  integration_test:
+    :path: ".symlinks/plugins/integration_test/ios"
+  permission_handler_apple:
+    :path: ".symlinks/plugins/permission_handler_apple/ios"
+
+SPEC CHECKSUMS:
+  Flutter: cabc95a1d2626b1b06e7179b784ebcf0c0cde467
+  improv_wifi_flutter: e4a1df424a63fc43c647944105d667adcf37bf42
+  integration_test: 252f60fa39af5e17c3aa9899d35d908a0721b573
+  permission_handler_apple: 9878588469a2b0d0fc1e048d9f43605f92e6cec2
+
+PODFILE CHECKSUM: 4eff67d0a836cec7916701393d553813e6ca7743
+
+COCOAPODS: 1.16.2
