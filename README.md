@@ -16,6 +16,15 @@ The plugin exposes a small cross-platform API for:
 - listening to native Improv events through a Dart stream
 - decoding fragmented RPC result notifications when devices use small BLE MTU
 
+## Licensing
+
+This package is distributed under the Apache License 2.0.
+
+It includes vendored source code derived from the upstream `improv-wifi`
+Android and iOS SDK repositories, with local modifications for Flutter plugin
+integration and fragmented RPC result parsing support. See `NOTICE` for
+attribution details.
+
 ## Installation
 
 Add the plugin to your Flutter app:

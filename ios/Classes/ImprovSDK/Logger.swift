@@ -3,6 +3,9 @@
 //  Improv-iOS
 //
 //  Created by Bruno Pantaleão on 03/07/2024.
+//  Modified by MrLiuYunPing on 2026-03-18 for improv_wifi_flutter.
+//  Changes include explicit iOS availability declarations and safer
+//  subsystem fallback handling for package redistribution.
 //
 
 import Foundation

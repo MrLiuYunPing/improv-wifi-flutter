@@ -1,0 +1,13 @@
+improv_wifi_flutter
+Copyright 2026 MrLiuYunPing
+
+This project includes vendored and modified source code derived from the
+improv-wifi open source projects:
+
+- https://github.com/improv-wifi/sdk-android
+- https://github.com/improv-wifi/sdk-iOS
+
+Those upstream projects are distributed under the Apache License 2.0.
+
+Files in this repository that were modified from the vendored upstream sources
+carry prominent modification notices in the source files where applicable.

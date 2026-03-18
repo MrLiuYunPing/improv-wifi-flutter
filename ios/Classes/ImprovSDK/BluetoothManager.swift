@@ -3,6 +3,9 @@
 //  Improv-iOS
 //
 //  Created by Bruno Pantaleão on 11/07/2024.
+//  Modified by MrLiuYunPing on 2026-03-18 for improv_wifi_flutter.
+//  Changes include plugin integration, corrected disconnect callback behavior,
+//  fragmented RPC result buffering, and Swift concurrency compatibility fixes.
 //
 
 import Foundation

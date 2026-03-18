@@ -1,3 +1,9 @@
+/*
+ * Modified by MrLiuYunPing on 2026-03-18 for improv_wifi_flutter.
+ * Changes include integrating plugin-specific event handling and fragmented
+ * RPC result parsing support for small BLE MTU devices.
+ */
+
 package com.wifi.improv
 
 import android.annotation.SuppressLint

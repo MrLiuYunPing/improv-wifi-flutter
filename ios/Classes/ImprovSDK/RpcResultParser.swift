@@ -1,3 +1,12 @@
+//
+//  RpcResultParser.swift
+//  improv_wifi_flutter
+//
+//  Added by MrLiuYunPing on 2026-03-18 for improv_wifi_flutter.
+//  This parser accumulates fragmented RPC result notifications and decodes
+//  complete Improv BLE result packets after checksum validation.
+//
+
 import Foundation
 
 final class RpcResultParser {
