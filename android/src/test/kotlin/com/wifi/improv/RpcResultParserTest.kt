@@ -35,16 +35,46 @@ internal class RpcResultParserTest {
     }
 
     @Test
-    fun append_dropsInvalidChecksumPacket() {
+    fun append_decodesPayloadEvenWhenChecksumDoesNotMatch() {
         val parser = RpcResultParser()
         val packet = buildPacket("bad").also { bytes ->
             bytes[bytes.lastIndex] = (bytes.last() + 1).toByte()
         }
 
-        assertTrue(parser.append(packet).isEmpty())
+        assertEquals(
+            listOf(listOf("bad")),
+            parser.append(packet)
+        )
     }
 
-    private fun buildPacket(vararg values: String): ByteArray {
+    @Test
+    fun append_decodesNonWifiCommandPacket() {
+        val parser = RpcResultParser()
+        val packet = buildPacket(command = 2, "device")
+
+        assertEquals(
+            listOf(listOf("device")),
+            parser.append(packet)
+        )
+    }
+
+    @Test
+    fun append_decodesFragmentedUrlPacketEvenWhenChecksumDoesNotMatch() {
+        val parser = RpcResultParser()
+        val packet = byteArrayOf(
+            0x01, 0x16, 0x15, 0x68, 0x74, 0x74, 0x70, 0x3A, 0x2F, 0x2F,
+            0x31, 0x39, 0x32, 0x2E, 0x31, 0x36, 0x38, 0x2E, 0x38, 0x37,
+            0x2E, 0x31, 0x30, 0x31, 0x01
+        )
+
+        assertTrue(parser.append(packet.copyOfRange(0, 20)).isEmpty())
+        assertEquals(
+            listOf(listOf("http://192.168.87.101")),
+            parser.append(packet.copyOfRange(20, packet.size))
+        )
+    }
+
+    private fun buildPacket(vararg values: String, command: Byte = 0x01): ByteArray {
         val payload = mutableListOf<Byte>()
         values.forEach { value ->
             val encoded = value.encodeToByteArray()
@@ -53,7 +83,7 @@ internal class RpcResultParserTest {
         }
 
         val packet = mutableListOf<Byte>()
-        packet += 0x01
+        packet += command
         packet += payload.size.toByte()
         packet += payload
 

@@ -111,6 +111,9 @@ public final class ImprovManager: NSObject, ImprovManagerProtocol {
     }
 
     public func reset() {
+        if let connectedDevice {
+            bluetoothManager.disconnectFromDevice(connectedDevice)
+        }
         stopScan()
         bluetoothState = bluetoothManager.state
         errorState = nil
@@ -118,6 +121,7 @@ public final class ImprovManager: NSObject, ImprovManagerProtocol {
         lastResult = nil
         foundDevices = [String: CBPeripheral]()
         connectedDevice = nil
+        scanInProgress = false
 
         delegate?.didReset()
     }

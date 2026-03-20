@@ -25,6 +25,7 @@ public class ImprovWifiFlutterPlugin: NSObject, FlutterPlugin, FlutterStreamHand
     case "getBluetoothState":
       result(mapBluetoothState(improvManager.bluetoothState))
     case "startScan":
+      improvManager.reset()
       improvManager.scan()
       result(nil)
     case "stopScan":
@@ -128,6 +129,15 @@ public class ImprovWifiFlutterPlugin: NSObject, FlutterPlugin, FlutterStreamHand
 
   public func didReceiveResult(_ result: [String]?) {
     emitEvent(type: "rpcResult", extra: ["rpcResult": result ?? []])
+  }
+
+  public func didReset() {
+    knownDeviceIds.removeAll()
+    emitEvent(type: "connectionStateChanged")
+    emitEvent(type: "deviceStateChanged")
+    emitEvent(type: "errorStateChanged")
+    emitEvent(type: "rpcResult", extra: ["rpcResult": []])
+    emitEvent(type: "scanningStateChanged", extra: ["isScanning": false])
   }
 
   public func didUpdateIsScanning(_ isScanning: Bool) {

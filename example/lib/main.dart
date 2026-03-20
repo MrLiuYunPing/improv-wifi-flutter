@@ -30,6 +30,7 @@ class _MyAppState extends State<MyApp> {
   ImprovDeviceState? _deviceState;
   ImprovErrorState? _errorState;
   List<String> _rpcResult = const <String>[];
+  final List<List<String>> _rpcResultsHistory = <List<String>>[];
   Map<Permission, PermissionStatus> _permissionStatuses =
       <Permission, PermissionStatus>{};
   bool _isScanning = false;
@@ -127,7 +128,19 @@ class _MyAppState extends State<MyApp> {
           _errorState = event.errorState;
           break;
         case ImprovWifiEventType.rpcResult:
-          _rpcResult = event.rpcResult ?? const <String>[];
+          final result = List<String>.from(
+            event.rpcResult ?? const <String>[],
+          );
+          _rpcResult = result;
+          if (result.isNotEmpty) {
+            _rpcResultsHistory.insert(0, result);
+            if (_rpcResultsHistory.length > 10) {
+              _rpcResultsHistory.removeLast();
+            }
+            _pushMessage('RPC result received: ${result.join(', ')}');
+          } else {
+            _pushMessage('RPC result received, but it was empty.');
+          }
           break;
         case ImprovWifiEventType.scanFailed:
           _pushMessage('Scan failed: ${event.reason ?? 'unknown reason'}');
@@ -255,6 +268,13 @@ class _MyAppState extends State<MyApp> {
     );
   }
 
+  String _formatRpcResult(List<String> result) {
+    if (result.isEmpty) {
+      return 'none';
+    }
+    return result.join('\n');
+  }
+
   String _statusLabel(Permission permission) {
     final status = _permissionStatuses[permission];
     if (status == null) {
@@ -304,7 +324,7 @@ class _MyAppState extends State<MyApp> {
                     Text('Device state: ${_deviceState?.name ?? 'none'}'),
                     Text('Error state: ${_errorState?.name ?? 'none'}'),
                     Text(
-                      'RPC result: ${_rpcResult.isEmpty ? 'none' : _rpcResult.join(', ')}',
+                      'Latest RPC result items: ${_rpcResult.length}',
                     ),
                   ],
                 ),
@@ -409,6 +429,50 @@ class _MyAppState extends State<MyApp> {
             ElevatedButton(
               onPressed: _sendWifi,
               child: const Text('Send Wi-Fi'),
+            ),
+            const SizedBox(height: 16),
+            const Text(
+              'RPC Result',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    const Text(
+                      'Latest result',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 8),
+                    SelectableText(_formatRpcResult(_rpcResult)),
+                    if (_rpcResultsHistory.isNotEmpty) ...<Widget>[
+                      const SizedBox(height: 16),
+                      const Text(
+                        'Recent results',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 8),
+                      for (final result in _rpcResultsHistory.take(5)) ...<
+                        Widget
+                      >[
+                        Container(
+                          width: double.infinity,
+                          margin: const EdgeInsets.only(bottom: 8),
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: Colors.grey.shade100,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: SelectableText(_formatRpcResult(result)),
+                        ),
+                      ],
+                    ],
+                  ],
+                ),
+              ),
             ),
             const SizedBox(height: 16),
             const Text(

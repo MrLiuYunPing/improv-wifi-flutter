@@ -169,7 +169,6 @@ final class BluetoothManager: NSObject, BluetoothManagerProtocol {
         default:
             fatalError("Unhandled Operation!")
         }
-        pendingOperation = nil
     }
 
     private func signalEndOfOperation() {
@@ -221,6 +220,9 @@ extension BluetoothManager: CBCentralManagerDelegate {
         bluetoothGatt = peripheral
         peripheral.delegate = self
         peripheral.discoverServices([BluetoothUUIDs.serviceProvision])
+        if pendingOperation is Connect {
+            signalEndOfOperation()
+        }
     }
 
     public func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: Error?) {
@@ -250,16 +252,15 @@ extension BluetoothManager: @preconcurrency CBPeripheralDelegate {
             Logger.main.info("Found service: \(service.uuid)")
             peripheral.discoverCharacteristics(nil, for: service)
         }
-
-        if let service = services.first(where: { $0.uuid == BluetoothUUIDs.serviceProvision }) {
-            updateStates(peripheral, service: service)
-        }
     }
 
     @MainActor
     public func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: Error?) {
         guard error == nil else {
             Logger.main.info("Error reading characteristic: \(error!.localizedDescription)")
+            if pendingOperation is CharacteristicRead {
+                signalEndOfOperation()
+            }
             return
         }
 
@@ -290,6 +291,10 @@ extension BluetoothManager: @preconcurrency CBPeripheralDelegate {
             default:
                 break
             }
+        }
+
+        if pendingOperation is CharacteristicRead {
+            signalEndOfOperation()
         }
     }
 

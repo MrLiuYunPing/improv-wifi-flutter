@@ -1,7 +1,8 @@
 /*
  * Added by MrLiuYunPing on 2026-03-18 for improv_wifi_flutter.
  * This parser accumulates fragmented RPC result notifications and decodes
- * complete Improv BLE result packets after checksum validation.
+ * complete Improv BLE result packets, logging checksum mismatches without
+ * dropping otherwise valid string payloads.
  */
 
 package com.wifi.improv
@@ -52,7 +53,9 @@ internal class RpcResultParser {
         val expectedChecksum = calculateChecksum(packet.copyOf(packet.size - 1))
         val actualChecksum = packet.last().toUByte()
         if (expectedChecksum != actualChecksum) {
-            return null
+            // Some devices return a valid URL payload with a checksum that
+            // doesn't match the published algorithm. Prefer surfacing the
+            // decoded RPC strings instead of dropping the whole result.
         }
 
         val strings = mutableListOf<String>()

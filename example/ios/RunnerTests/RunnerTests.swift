@@ -36,7 +36,32 @@ class RunnerTests: XCTestCase {
     XCTAssertTrue(parser.append(packet).isEmpty)
   }
 
-  private func buildPacket(_ values: [String]) -> Data {
+  func testAppendDecodesNonWifiCommandPacket() {
+    let parser = RpcResultParser()
+    let packet = buildPacket(["device"], command: 2)
+
+    XCTAssertEqual(
+      parser.append(packet),
+      [["device"]]
+    )
+  }
+
+  func testAppendDecodesFragmentedUrlPacketEvenWhenChecksumDoesNotMatch() {
+    let parser = RpcResultParser()
+    let packet = Data([
+      0x01, 0x16, 0x15, 0x68, 0x74, 0x74, 0x70, 0x3A, 0x2F, 0x2F,
+      0x31, 0x39, 0x32, 0x2E, 0x31, 0x36, 0x38, 0x2E, 0x38, 0x37,
+      0x2E, 0x31, 0x30, 0x31, 0x01,
+    ])
+
+    XCTAssertTrue(parser.append(packet.prefix(20)).isEmpty)
+    XCTAssertEqual(
+      parser.append(packet.dropFirst(20)),
+      [["http://192.168.87.101"]]
+    )
+  }
+
+  private func buildPacket(_ values: [String], command: UInt8 = 1) -> Data {
     var payload: [UInt8] = []
     for value in values {
       let encoded = Array(value.utf8)
@@ -44,7 +69,7 @@ class RunnerTests: XCTestCase {
       payload.append(contentsOf: encoded)
     }
 
-    var packet: [UInt8] = [1, UInt8(payload.count)]
+    var packet: [UInt8] = [command, UInt8(payload.count)]
     packet.append(contentsOf: payload)
 
     let checksum = packet.reduce(0 as UInt8) { partialResult, byte in

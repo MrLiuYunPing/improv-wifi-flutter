@@ -4,13 +4,16 @@
 //
 //  Added by MrLiuYunPing on 2026-03-18 for improv_wifi_flutter.
 //  This parser accumulates fragmented RPC result notifications and decodes
-//  complete Improv BLE result packets after checksum validation.
+//  complete Improv BLE result packets, logging checksum mismatches without
+//  dropping otherwise valid string payloads.
 //
 
 import Foundation
+import OSLog
 
 final class RpcResultParser {
     private var buffer: [UInt8] = []
+    private let logger = Logger(subsystem: "com.shushikeji.improv_wifi_flutter", category: "RpcResultParser")
 
     func reset() {
         buffer.removeAll()
@@ -49,7 +52,11 @@ final class RpcResultParser {
         let body = Array(packet.dropLast())
         let expectedChecksum = calculateChecksum(body)
         let actualChecksum = packet[packet.count - 1]
-        guard expectedChecksum == actualChecksum else { return nil }
+        if expectedChecksum != actualChecksum {
+            logger.error(
+                "RPC checksum mismatch. expected=\(expectedChecksum) actual=\(actualChecksum)"
+            )
+        }
 
         var strings: [String] = []
         var currentIndex = 2
