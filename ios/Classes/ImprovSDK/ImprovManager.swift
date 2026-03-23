@@ -89,8 +89,6 @@ public final class ImprovManager: NSObject, ImprovManagerProtocol {
 
     public func stopScan() {
         bluetoothManager.stopScan()
-        foundDevices = [:]
-        delegate?.didUpdateFoundDevices(devices: foundDevices)
     }
 
     public func connectToDevice(_ peripheral: CBPeripheral) {
