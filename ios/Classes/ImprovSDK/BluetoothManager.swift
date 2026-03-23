@@ -159,7 +159,12 @@ final class BluetoothManager: NSObject, BluetoothManagerProtocol {
 
         switch operation {
         case let connect as Connect:
-            centralManager?.connect(connect.device, options: nil)
+            if let centralManager {
+                centralManager.connect(connect.device, options: nil)
+            } else {
+                Logger.main.error("Tried connecting without a central manager.")
+                signalEndOfOperation()
+            }
         case let write as CharacteristicWrite:
             bluetoothGatt?.writeValue(write.data, for: write.char, type: .withResponse)
         case let read as CharacteristicRead:
@@ -220,6 +225,17 @@ extension BluetoothManager: CBCentralManagerDelegate {
         bluetoothGatt = peripheral
         peripheral.delegate = self
         peripheral.discoverServices([BluetoothUUIDs.serviceProvision])
+        if pendingOperation is Connect {
+            signalEndOfOperation()
+        }
+    }
+
+    public func centralManager(_ central: CBCentralManager, didFailToConnect peripheral: CBPeripheral, error: Error?) {
+        Logger.main.error(
+            "Failed to connect to \(peripheral.identifier.uuidString): \(error?.localizedDescription ?? "unknown error")"
+        )
+        rpcResultParser.reset()
+        bluetoothGatt = nil
         if pendingOperation is Connect {
             signalEndOfOperation()
         }

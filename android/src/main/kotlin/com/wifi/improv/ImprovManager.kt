@@ -333,7 +333,11 @@ class ImprovManager(
 
         when (operation) {
             is Connect -> {
-                operation.device.connectGatt(context, true, gattCallback)
+                val gatt = operation.device.connectGatt(context, true, gattCallback)
+                if (gatt == null) {
+                    Log.e(TAG, "connectGatt returned null for ${operation.device.address}")
+                    signalEndOfOperation()
+                }
             }
             is Disconnect -> {
                 // Noop?
@@ -343,6 +347,7 @@ class ImprovManager(
                     bluetoothGatt!!.discoverServices()
                 } else {
                     Log.e(TAG, "Tried to discover services without device connected.")
+                    signalEndOfOperation()
                 }
             }
             is CharacteristicWrite -> {
@@ -350,6 +355,7 @@ class ImprovManager(
                     bluetoothGatt!!.writeCharacteristic(operation.char)
                 } else {
                     Log.e(TAG, "Tried writing characteristic without device connected.")
+                    signalEndOfOperation()
                 }
             }
             is CharacteristicRead -> {
@@ -357,6 +363,7 @@ class ImprovManager(
                     bluetoothGatt!!.readCharacteristic(operation.char)
                 } else {
                     Log.e(TAG, "Tried reading characteristic without device connected.")
+                    signalEndOfOperation()
                 }
             }
             is DescriptorWrite -> {
@@ -364,6 +371,7 @@ class ImprovManager(
                     bluetoothGatt!!.writeDescriptor(operation.desc)
                 } else {
                     Log.e(TAG, "Tried writing descriptor without device connected.")
+                    signalEndOfOperation()
                 }
             }
             is RequestLargeMtu -> {
@@ -371,6 +379,7 @@ class ImprovManager(
                     bluetoothGatt!!.requestMtu(517)
                 } else {
                     Log.e(TAG, "Tried requesting MTU without device connected.")
+                    signalEndOfOperation()
                 }
             }
             else -> {

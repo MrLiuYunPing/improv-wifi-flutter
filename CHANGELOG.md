@@ -1,3 +1,8 @@
+## 0.0.4
+
+* Avoid stalling BLE operation queues when Android GATT operations or iOS central manager setup fail.
+* Handle iOS connection failures without emitting a disconnect event for devices that never connected.
+
 ## 0.0.3
 
 * Keep discovered iOS peripherals when stopping a scan so users can still connect after scan stops.

@@ -50,7 +50,7 @@ internal class RpcResultParserTest {
     @Test
     fun append_decodesNonWifiCommandPacket() {
         val parser = RpcResultParser()
-        val packet = buildPacket(command = 2, "device")
+        val packet = buildPacket("device", command = 0x02)
 
         assertEquals(
             listOf(listOf("device")),
